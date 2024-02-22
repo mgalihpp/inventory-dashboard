@@ -1,4 +1,4 @@
-import SupplierTable from "@/components/Table/suppliertable";
+import SupplierTable from "@/components/table/suppliertable";
 import prisma from "@/lib/db";
 import { Supplier } from "@prisma/client";
 import { GetServerSideProps } from "next/types";

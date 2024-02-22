@@ -1,10 +1,12 @@
-import UserTable from "@/components/Table/usertable";
+import UserTable from "@/components/table/usertable";
 import prisma from "@/lib/db";
 import type { $Enums } from "@prisma/client";
 import { FolderInput, Plus } from "lucide-react";
 import { GetServerSideProps } from "next/types";
 import Head from "next/head";
 import Sidebar from "@/components/sidebar";
+import AddUser from "@/components/modal/adduser";
+import { useState } from "react";
 
 // Define a new interface for User data without the password field
 interface UserDataWithoutPassword {
@@ -23,6 +25,8 @@ interface UsersDashboardProps {
 }
 
 export default function UsersDashboard({ data }: UsersDashboardProps) {
+  const [openModal, setOpenModal] = useState(false);
+
   return (
     <>
       <Head>
@@ -34,6 +38,7 @@ export default function UsersDashboard({ data }: UsersDashboardProps) {
 
           <div className="flex flex-wrap gap-4">
             <button
+              onClick={() => exportToCSV(data)}
               className="p-2 rounded-md bg-blue-400 text-white font-semibold 
             flex gap-2 text-sm items-center
             "
@@ -41,14 +46,8 @@ export default function UsersDashboard({ data }: UsersDashboardProps) {
               <FolderInput className="h-4 w-4 self-center" />
               Export Data
             </button>
-            <button
-              className="p-2 rounded-md bg-green-400 text-white font-semibold 
-            flex gap-2 text-sm items-center
-            "
-            >
-              <Plus className="h-4 w-4 self-center" />
-              Add Data
-            </button>
+
+            <AddUser open={openModal} onOpenChange={setOpenModal} />
           </div>
         </div>
 
@@ -92,3 +91,25 @@ export const getServerSideProps: GetServerSideProps<
     };
   }
 };
+
+function exportToCSV(dataArray: any[]) {
+  // Convert data array to CSV format
+  const csvContent = dataArray
+    .map((row) => Object.values(row).join(","))
+    .join("\n");
+
+  // Create a Blob object from the CSV content
+  const blob = new Blob([csvContent], { type: "text/csv" });
+
+  // Create a download link
+  const url = window.URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "data.csv";
+
+  // Trigger the download
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  window.URL.revokeObjectURL(url);
+}
