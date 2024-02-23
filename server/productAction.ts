@@ -83,3 +83,19 @@ export async function AddNewProduct({ product }: { product: ExtendedProduct }) {
     return { error: "Internal Server Error" };
   }
 }
+
+export async function DeleteProduct(productId: string) {
+  try {
+    await prisma.product.delete({
+      where: {
+        id: productId,
+      },
+    });
+
+    return { success: true };
+  } catch (error) {
+    console.error("Error creating user:", error);
+    // Handle error
+    return { error: "Internal Server Error" };
+  }
+}

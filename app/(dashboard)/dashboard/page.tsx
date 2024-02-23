@@ -1,15 +1,12 @@
 import ApexChart from "@/components/chart/spline";
-import { getAllUser } from "@/server/userAction";
 import { UploadIcon } from "lucide-react";
 import { Metadata } from "next";
 
-export const metadata: Metadata = {
+const metadata: Metadata = {
   title: "Dashboard",
   description: "dashboard company",
 };
-export default async function Dashboard() {
-  const data = await getAllUser();
-
+export default function Dashboard() {
   return (
     <>
       <div className="flex justify-between">
@@ -35,7 +32,7 @@ export default async function Dashboard() {
 function UserReport() {
   return (
     <>
-      <div className="max-w-sm w-full bg-white rounded-xl shadow dark:bg-gray-800 p-4 md:p-6">
+      <div className="max-w-sm w-full bg-white rounded-lg shadow dark:bg-gray-800 p-4 md:p-6">
         <div className="flex justify-between">
           <div>
             <h5 className="leading-none text-3xl font-bold text-gray-900 dark:text-white pb-2">

@@ -84,3 +84,19 @@ export async function AddNewSupplier({
     return { error: "Internal Server Error" };
   }
 }
+
+export async function DeleteSupplier(supplierId: string) {
+  try {
+    await prisma.supplier.delete({
+      where: {
+        id: supplierId,
+      },
+    });
+
+    return { success: true };
+  } catch (error) {
+    console.error("Error creating user:", error);
+    // Handle error
+    return { error: "Internal Server Error" };
+  }
+}

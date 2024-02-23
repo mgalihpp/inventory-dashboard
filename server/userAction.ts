@@ -92,3 +92,19 @@ export async function AddNewUser({ user }: { user: ExtendedUser }) {
     return { error: "Internal Server Error" };
   }
 }
+
+export async function DeleteUser(userId: string) {
+  try {
+    await prisma.user.delete({
+      where: {
+        id: userId,
+      },
+    });
+
+    return { success: true };
+  } catch (error) {
+    console.error("Error creating user:", error);
+    // Handle error
+    return { error: "Internal Server Error" };
+  }
+}

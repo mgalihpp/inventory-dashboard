@@ -1,5 +1,7 @@
 import { Supplier } from "@prisma/client";
-import { Info, PencilLine, Trash2 } from "lucide-react";
+import { Info, PencilLine } from "lucide-react";
+import DeleteButton from "../button/deletebtn";
+import { DeleteSupplier } from "@/server/supplierAction";
 
 // Define an interface for the props
 interface TableProps {
@@ -12,7 +14,7 @@ export default function SupplierTable({ suppliers }: TableProps) {
     <>
       <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
         <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
-          <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+          <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-900 dark:text-gray-400">
             <tr>
               <th scope="col" className="px-6 py-3">
                 No
@@ -118,13 +120,7 @@ export default function SupplierTable({ suppliers }: TableProps) {
                       <Info className="w-4 h-4" />
                       Info
                     </button>
-                    <button
-                      className="flex items-center gap-2 font-medium bg-red-500 
-                    text-white px-4 py-2 rounded-md hover:bg-red-600"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                      Delete
-                    </button>
+                    <DeleteButton deleteAction={DeleteSupplier} id={item.id} />
                   </div>
                 </td>
               </tr>
