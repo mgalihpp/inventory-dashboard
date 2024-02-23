@@ -1,6 +1,5 @@
 import { PrismaClient, User } from "@prisma/client";
 import bcrypt from "bcrypt";
-
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 

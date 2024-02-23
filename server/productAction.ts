@@ -1,28 +1,28 @@
 "use server";
 
 import prisma from "@/lib/db";
-import { User } from "@prisma/client";
+import { Product } from "@prisma/client";
 
-interface GetAllUserOptions {
+interface GetAllProductOptions {
   page?: number;
   pageSize?: number;
   sortBy?: string;
   sortOrder?: "asc" | "desc";
   filterBy?: {
-    username?: string;
+    name?: string;
     // Add more filter options as needed
   };
 }
 
-interface GetAllUserResult {
-  users: User[];
+interface GetAllProductResult {
+  products: Product[];
   totalCount: number;
 }
 
-// get user
-export async function getAllUser(
-  options: GetAllUserOptions = {}
-): Promise<GetAllUserResult> {
+// get supplier
+export async function getAllProduct(
+  options: GetAllProductOptions = {}
+): Promise<GetAllProductResult> {
   try {
     const {
       page = 1,
@@ -32,7 +32,7 @@ export async function getAllUser(
       filterBy = {},
     } = options;
 
-    const users = await prisma.user.findMany({
+    const products = await prisma.product.findMany({
       take: pageSize,
       skip: (page - 1) * pageSize,
       // orderBy: {
@@ -41,17 +41,17 @@ export async function getAllUser(
       where: {
         // You can add filtering conditions here based on filterBy object
         // Example: filter by name
-        username: {
-          contains: filterBy.username, // If filterBy.name is provided, only return users whose name contains the specified string
+        name: {
+          contains: filterBy.name, // If filterBy.name is provided, only return products whose name contains the specified string
         },
       },
     });
 
-    const totalUsersCount = await prisma.user.count(); // Total count of users
+    const totalSupplierCount = await prisma.product.count(); // Total count of products
 
     return {
-      users,
-      totalCount: totalUsersCount,
+      products,
+      totalCount: totalSupplierCount,
     };
   } catch (error) {
     console.error("Error fetching users:", error);
@@ -59,31 +59,22 @@ export async function getAllUser(
   }
 }
 
-type ExtendedUser = Omit<User, "id">;
+type ExtendedProduct = Omit<Product, "id">;
 
-export async function AddNewUser({ user }: { user: ExtendedUser }) {
+export async function AddNewProduct({ product }: { product: ExtendedProduct }) {
   try {
-    const { fullname, username, email, password, avatar, address, role } = user;
+    const { name, category, qty, price, status } = product;
 
-    const isUserEmailExits = await prisma.user.findUnique({
-      where: {
-        email: email,
-      },
-    });
-
-    if (isUserEmailExits) return { error: "User already exits" };
-
-    await prisma.user.create({
+    await prisma.product.create({
       data: {
-        fullname,
-        username,
-        email,
-        password,
-        address,
-        avatar,
-        role,
+        name,
+        category,
+        qty,
+        price,
+        status,
       },
     });
+
     // Handle successful user creation
     return { success: true };
   } catch (error) {

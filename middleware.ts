@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 
 // Middleware function to check if the user is authenticated
 export function middleware(req: NextRequest) {
-  const res = NextResponse.next();
   loggingMiddleware(req);
 
   const token = req.cookies.has("token");
@@ -27,6 +26,15 @@ function loggingMiddleware(req: NextRequest) {
 
 // Configuration for the middleware
 export const config = {
-  // Define the route pattern to which the middleware should apply
-  matcher: ["/", "/(dashboard)"],
+  matcher: [
+    /*
+     * Match all request paths except for the ones starting with:
+     * - api (API routes)
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico (favicon file)
+     * - auth/login (login page)
+     */
+    // "/((?!api|_next/static|_next/image|favicon.ico|auth/login).+)",
+  ],
 };
