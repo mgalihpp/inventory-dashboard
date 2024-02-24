@@ -339,7 +339,7 @@ export function AddProductDialog() {
           dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800"
         >
           <UploadIcon className="w-4 h-4" />
-          Add product
+          Add supplier
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">

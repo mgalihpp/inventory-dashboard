@@ -20,6 +20,7 @@ import { EditSupplierDialog } from "./dialog";
 interface props {
   columns: ColumnDef<any, any>[];
   data: any[];
+  columnFilter: string;
 }
 
 export default function SupplierTable({ data }: { data: SupplierWithId[] }) {
@@ -90,6 +91,7 @@ export default function SupplierTable({ data }: { data: SupplierWithId[] }) {
       },
     ],
     data: data,
+    columnFilter: "name",
   };
 
   return <DataTable {...props} />;

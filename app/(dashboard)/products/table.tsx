@@ -16,10 +16,13 @@ import { ColumnDef } from "@tanstack/react-table";
 import { MoreHorizontal } from "lucide-react";
 import { toast } from "sonner";
 import { EditProductDialog } from "./dialog";
+import DeleteButton from "@/components/button/deletebtn";
+import { DeleteProduct } from "@/server/productAction";
 
 interface props {
   columns: ColumnDef<any, any>[];
   data: any[];
+  columnFilter: string;
 }
 
 export default function ProductTable({ data }: { data: ProductWithId[] }) {
@@ -40,7 +43,9 @@ export default function ProductTable({ data }: { data: ProductWithId[] }) {
           <DataTableColumnHeader column={column} title="Category" />
         ),
         cell: ({ row }) => (
-          <div className="capitalize truncate max-w-48">{row.getValue("category")}</div>
+          <div className="capitalize truncate max-w-48">
+            {row.getValue("category")}
+          </div>
         ),
       },
       {
@@ -112,7 +117,7 @@ export default function ProductTable({ data }: { data: ProductWithId[] }) {
                 <DropdownMenuSeparator />
                 <EditProductDialog productId={product.id} />
                 <DropdownMenuItem>View product details</DropdownMenuItem>
-                <DropdownMenuItem>Delete product</DropdownMenuItem>
+                <DeleteButton deleteAction={DeleteProduct} id={product.id}/>
               </DropdownMenuContent>
             </DropdownMenu>
           );
@@ -120,6 +125,7 @@ export default function ProductTable({ data }: { data: ProductWithId[] }) {
       },
     ],
     data: data,
+    columnFilter: "name",
   };
 
   return <DataTable {...props} />;

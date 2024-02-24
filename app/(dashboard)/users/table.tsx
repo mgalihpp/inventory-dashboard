@@ -20,6 +20,7 @@ import { EditUserDialog } from "./dialog";
 interface props {
   columns: ColumnDef<any, any>[];
   data: any[];
+  columnFilter: string;
 }
 
 export default function UserTable({ data }: { data: UserWithId[] }) {
@@ -108,6 +109,7 @@ export default function UserTable({ data }: { data: UserWithId[] }) {
       },
     ],
     data: data,
+    columnFilter: "fullname",
   };
 
   return <DataTable {...props} />;

@@ -4,6 +4,7 @@ import { useServerAction } from "@/hooks/useServerAction";
 import { Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { Button } from "../ui/button";
 
 export default function DeleteButton({
   deleteAction,
@@ -26,7 +27,7 @@ export default function DeleteButton({
       if (result.success) {
         // Handle success
 
-        toast(` Success Deleting id=${id}`);
+        toast.error(`Success Deleting id=${id}`);
 
         router.refresh();
       } else {
@@ -37,13 +38,17 @@ export default function DeleteButton({
   };
 
   return (
-    <button
+    <Button
       onClick={() => handleDelete()}
-      className="flex items-center gap-2 font-medium bg-red-500 
-      text-white px-4 py-2 rounded-md hover:bg-red-600"
+      variant="ghost"
+      size="sm"
+      type="button"
+      className="relative flex cursor-default select-none items-center justify-start 
+      rounded-sm px-2 text-sm outline-none transition-colors 
+      focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none 
+      data-[disabled]:opacity-50 w-full"
     >
-      <Trash2 className="w-4 h-4" />
       Delete
-    </button>
+    </Button>
   );
 }
