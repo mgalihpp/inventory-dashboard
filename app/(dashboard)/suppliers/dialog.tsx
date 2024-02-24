@@ -23,6 +23,7 @@ import { Supplier } from "@/types/supplier";
 import { Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { ChangeEvent, useEffect, useState } from "react";
+import { toast } from "sonner";
 
 export function EditSupplierDialog({ supplierId }: { supplierId: string }) {
   const [open, setOpen] = useState(false);
@@ -81,6 +82,8 @@ export function EditSupplierDialog({ supplierId }: { supplierId: string }) {
             address: "",
             phone: "",
           });
+
+          toast.success("Success updated supplier");
 
           setOpen(false);
 
@@ -214,6 +217,8 @@ export function AddSupplierDialog() {
             address: "",
             phone: "",
           });
+
+          toast.success("Success created new supplier");
 
           setOpen(false);
 

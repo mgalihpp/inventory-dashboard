@@ -27,6 +27,7 @@ import { $Enums } from "@prisma/client";
 import { Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { ChangeEvent, useEffect, useState } from "react";
+import { toast } from "sonner";
 
 export function EditUserDialog({ userId }: { userId: string }) {
   const [open, setOpen] = useState(false);
@@ -93,6 +94,8 @@ export function EditUserDialog({ userId }: { userId: string }) {
             address: "",
             role: "CUSTOMER",
           });
+
+          toast.success("Success updated user");
 
           setOpen(false);
 
@@ -292,6 +295,8 @@ export function AddUserDialog() {
             address: "",
             role: "CUSTOMER",
           });
+
+          toast.success("Success created new user");
 
           setOpen(false);
 

@@ -32,6 +32,7 @@ import { $Enums } from "@prisma/client";
 import { Loader2, UploadIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { ChangeEvent, useEffect, useState } from "react";
+import { toast } from "sonner";
 
 export function EditProductDialog({ productId }: { productId: string }) {
   const [open, setOpen] = useState(false);
@@ -109,6 +110,8 @@ export function EditProductDialog({ productId }: { productId: string }) {
             qty: 0,
             status: "AVAILABLE",
           });
+
+          toast.success("Success updated product");
 
           setOpen(false);
 
@@ -299,7 +302,7 @@ export function AddProductDialog() {
 
   const handleSubmit = async () => {
     try {
-      // const product = createRandomProduct();
+      const product = createRandomProduct();
 
       await runAction({
         product,
@@ -312,6 +315,8 @@ export function AddProductDialog() {
             price: 0,
             status: "AVAILABLE",
           });
+
+          toast.success("Success created new product");
 
           setOpen(false);
 
