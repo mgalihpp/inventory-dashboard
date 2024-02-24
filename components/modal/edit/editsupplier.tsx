@@ -1,25 +1,48 @@
 "use client";
 
-import { ChangeEvent, useState } from "react";
-import { UploadIcon } from "lucide-react";
-import { User } from "@prisma/client";
+import {
+  ChangeEvent,
+  Dispatch,
+  SetStateAction,
+  useEffect,
+  useState,
+} from "react";
+import { PencilLine } from "lucide-react";
+import { Supplier } from "@prisma/client";
 import { useServerAction } from "@/hooks/useServerAction";
-import { AddNewUser } from "@/server/userAction";
+import { EditSupplier, getSupplierById } from "@/server/supplierAction";
 import { useRouter } from "next/navigation";
+import { useServerFetch } from "@/hooks/useServerFetch";
 
-type ExtendedUser = Omit<User, "id">;
+type ExtendedSupplier = Omit<Supplier, "id">;
 
-export default function AddUser() {
-  const [open, setOpen] = useState(false);
+interface DialogState {
+  [supplierId: string]: boolean;
+}
 
-  const [user, setUser] = useState<ExtendedUser>({
-    fullname: "",
-    username: "",
-    email: "",
-    password: "",
-    avatar: "",
+export default function EditButton({ supplierId }: { supplierId: string }) {
+  const [open, setOpen] = useState<DialogState>({});
+
+  // Function to open dialog for a specific
+  const openDialog = (supplierId: string) => {
+    setOpen((prevOpen) => ({
+      ...prevOpen,
+      [supplierId]: true,
+    }));
+  };
+
+  // Function to close dialog for a specific
+  const closeDialog = (supplierId: string) => {
+    setOpen((prevOpen) => ({
+      ...prevOpen,
+      [supplierId]: false,
+    }));
+  };
+
+  const [supplier, setSupplier] = useState<ExtendedSupplier>({
+    name: "",
     address: "",
-    role: "CUSTOMER",
+    phone: "",
   });
 
   const [error, setError] = useState("");
@@ -30,31 +53,27 @@ export default function AddUser() {
     const { name, value } = e.target;
 
     // Update the user state based on the input field name
-    setUser((prevUser) => ({
-      ...prevUser,
+    setSupplier((prevSupplier) => ({
+      ...prevSupplier,
       [name]: value,
     }));
   };
 
   const router = useRouter();
 
-  const [runAction, isRunning] = useServerAction(AddNewUser);
+  const [runAction, isRunning] = useServerAction(EditSupplier);
 
   const handleSubmit = async () => {
     try {
-      await runAction({ user }).then((result) => {
+      await runAction({ supplier, supplierId }).then((result) => {
         if (result.success) {
-          setUser({
-            fullname: "",
-            username: "",
-            email: "",
-            password: "",
-            avatar: "",
+          setSupplier({
+            name: "",
             address: "",
-            role: "CUSTOMER",
+            phone: "",
           });
 
-          setOpen(false);
+          closeDialog(supplierId);
 
           router.refresh();
         } else {
@@ -67,21 +86,86 @@ export default function AddUser() {
     }
   };
 
+  const props = {
+    closeDialog,
+    handleChange,
+    handleSubmit,
+    open,
+    error,
+    setError,
+    supplierId,
+    supplier,
+    setSupplier,
+    isRunning,
+  };
+
   return (
     <>
       {/* <!-- Modal toggle --> */}
       <button
-        onClick={() => setOpen(true)}
+        onClick={() => openDialog(supplierId)}
         data-modal-target="crud-modal"
         data-modal-toggle="crud-modal"
-        className="flex items-center gap-2 justify-center text-white bg-green-500 hover:bg-green-600 focus:ring-2 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800"
+        className="flex items-center gap-2 font-medium bg-blue-500 
+        text-white px-4 py-2 rounded-md hover:bg-blue-600"
         type="button"
       >
-        <UploadIcon className="w-4 h-4" />
-        Add Data
+        <PencilLine className="w-4 h-4" />
+        Edit
       </button>
 
-      {open && (
+      <MainModal {...props} />
+    </>
+  );
+}
+
+function MainModal({
+  open,
+  supplierId,
+  error,
+  setError,
+  closeDialog,
+  handleSubmit,
+  handleChange,
+  supplier,
+  setSupplier,
+  isRunning,
+}: {
+  open: DialogState;
+  supplierId: string;
+  error: string;
+  supplier: ExtendedSupplier;
+  setSupplier: Dispatch<SetStateAction<ExtendedSupplier>>;
+  setError: Dispatch<SetStateAction<string>>;
+  closeDialog: (supplierId: string) => void;
+  handleSubmit: (formdata: FormData) => void;
+  handleChange: (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => void;
+  isRunning: boolean;
+}) {
+  const [fetchData] = useServerFetch(
+    async () => {
+      const result = await getSupplierById(supplierId);
+
+      return result;
+    },
+    (result) => {
+      if ("error" in result) {
+        setError(result.error);
+      } else {
+        setSupplier(result);
+      }
+    }
+  );
+
+  useEffect(() => {
+    if (open[supplierId]) {
+      fetchData();
+    }
+  }, [open]);
+
+  return (
+    <>
+      {open[supplierId] && (
         <>
           {/* <!-- Overlay --> */}
           <div className="fixed top-0 left-0 w-full h-full bg-black opacity-50 z-50"></div>
@@ -99,10 +183,10 @@ export default function AddUser() {
                 {/* <!-- Modal header --> */}
                 <div className="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600">
                   <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                    Create New User
+                    Update Supplier
                   </h3>
                   <button
-                    onClick={() => setOpen(false)}
+                    onClick={() => closeDialog(supplierId)}
                     type="button"
                     className="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
                     data-modal-toggle="crud-modal"
@@ -128,93 +212,25 @@ export default function AddUser() {
                 {/* <!-- Modal body --> */}
                 <form className="p-4 md:p-5" action={handleSubmit}>
                   <div className="grid gap-4 mb-4 grid-cols-2">
-                    <div className="col-span-2">
+                    <div className="col-span-2  text-left">
                       <label
-                        htmlFor="fullname"
+                        htmlFor="name"
                         className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
                       >
-                        Fullname
+                        Name
                       </label>
                       <input
                         type="text"
-                        name="fullname"
-                        id="fullname"
+                        name="name"
+                        id="name"
                         className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                        placeholder="User fullname"
+                        placeholder="Supplier name"
+                        value={supplier.name ?? ""}
                         onChange={handleChange}
                         required
                       />
                     </div>
-                    <div className="col-span-2">
-                      <label
-                        htmlFor="email"
-                        className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-                      >
-                        Email
-                      </label>
-                      <input
-                        type="email"
-                        name="email"
-                        id="email"
-                        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                        onChange={handleChange}
-                        placeholder="User email"
-                        required
-                      />
-                    </div>
-                    <div className="col-span-2">
-                      <label
-                        htmlFor="password"
-                        className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-                      >
-                        Password
-                      </label>
-                      <input
-                        type="password"
-                        name="password"
-                        id="password"
-                        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                        onChange={handleChange}
-                        placeholder="User password"
-                        required
-                      />
-                    </div>
-                    <div className="col-span-2 sm:col-span-1">
-                      <label
-                        htmlFor="username"
-                        className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-                      >
-                        Username
-                      </label>
-                      <input
-                        type="text"
-                        name="username"
-                        id="username"
-                        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                        onChange={handleChange}
-                        placeholder="User username"
-                        required
-                      />
-                    </div>
-                    <div className="col-span-2 sm:col-span-1">
-                      <label
-                        htmlFor="role"
-                        className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-                      >
-                        Role
-                      </label>
-                      <select
-                        id="role"
-                        name="role"
-                        onChange={handleChange}
-                        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                      >
-                        <option>Select role</option>
-                        <option value="ADMIN">Admin</option>
-                        <option value="CUSTOMER">Customer</option>
-                      </select>
-                    </div>
-                    <div className="col-span-2">
+                    <div className="col-span-2  text-left">
                       <label
                         htmlFor="address"
                         className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
@@ -222,27 +238,32 @@ export default function AddUser() {
                         Address
                       </label>
                       <input
-                        id="address"
+                        type="text"
                         name="address"
+                        id="address"
+                        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                        placeholder="Supplier address"
+                        value={supplier.address ?? ""}
                         onChange={handleChange}
-                        className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                        placeholder="User address"
+                        required
                       />
                     </div>
-                    <div className="col-span-2">
+                    <div className="col-span-2  text-left">
                       <label
-                        htmlFor="avatar"
+                        htmlFor="phone"
                         className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
                       >
-                        Avatar
+                        Phone
                       </label>
                       <input
-                        type="file"
-                        id="avatar"
-                        name="avatar"
+                        type="text"
+                        name="phone"
+                        id="phone"
+                        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                        placeholder="Supplier phone"
+                        value={supplier.phone ?? ""}
                         onChange={handleChange}
-                        className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                        placeholder="User avatar"
+                        required
                       />
                     </div>
                   </div>
@@ -270,7 +291,7 @@ export default function AddUser() {
                         clipRule="evenodd"
                       ></path>
                     </svg>
-                    Add new user
+                    Update
                   </button>
                 </form>
               </div>

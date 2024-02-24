@@ -2,6 +2,7 @@ import AddSupplier from "@/components/modal/create/addsupplier";
 import SupplierTable from "@/components/table/suppliertable";
 import { getAllSupplier } from "@/server/supplierAction";
 import { Metadata } from "next";
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Suppliers",

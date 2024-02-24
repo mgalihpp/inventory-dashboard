@@ -61,6 +61,26 @@ export async function getAllUser(
 
 type ExtendedUser = Omit<User, "id">;
 
+export async function getUserById(userId: string) {
+  try {
+    const user = await prisma.user.findFirst({
+      where: {
+        id: userId,
+      },
+    });
+
+    if (!user) {
+      return { error: "User not found" }; // Return an error object
+    }
+
+    return user;
+  } catch (error) {
+    console.error("Error fetching user:", error);
+    // Handle error
+    return { error: "Internal Server Error" }; // Return an error object
+  }
+}
+
 export async function AddNewUser({ user }: { user: ExtendedUser }) {
   try {
     const { fullname, username, email, password, avatar, address, role } = user;
@@ -88,6 +108,46 @@ export async function AddNewUser({ user }: { user: ExtendedUser }) {
     return { success: true };
   } catch (error) {
     console.error("Error creating user:", error);
+    // Handle error
+    return { error: "Internal Server Error" };
+  }
+}
+
+export async function EditUser({
+  user,
+  userId,
+}: {
+  user: ExtendedUser;
+  userId: string;
+}) {
+  try {
+    const { fullname, username, email, password, address, avatar, role } = user;
+
+    const isUser = await prisma.user.findFirst({
+      where: {
+        id: userId,
+      },
+    });
+
+    if (!isUser) return { error: "User not found" };
+
+    await prisma.user.update({
+      where: {
+        id: isUser.id,
+      },
+      data: {
+        fullname: fullname ?? isUser.fullname,
+        username: username ?? isUser.username,
+        email: email ?? isUser.email,
+        password: password ?? isUser.password,
+        address: address ?? isUser.address,
+        avatar: avatar ?? isUser.avatar,
+        role: role ?? isUser.role,
+      },
+    });
+    return { success: true };
+  } catch (error) {
+    console.error("Error updating user:", error);
     // Handle error
     return { error: "Internal Server Error" };
   }

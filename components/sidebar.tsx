@@ -1,11 +1,12 @@
 "use client";
 
-import { useServerAction } from "@/hooks/useServerActions";
+import { useServerAction } from "@/hooks/useServerAction";
 import { LogoutAction } from "@/server/authActions";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ReactNode, useState } from "react";
+import { ModeToggle } from "./mode-toggle";
 
 export default function Sidebar({ children }: { children: ReactNode }) {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -21,7 +22,7 @@ export default function Sidebar({ children }: { children: ReactNode }) {
 
   return (
     <>
-      <nav className="fixed top-0 z-50 w-full bg-white border-b border-gray-200 dark:bg-gray-800 dark:border-gray-700">
+      <nav className="fixed top-0 z-50 w-full bg-primary-foreground border-b dark:border-gray-700">
         <div className="px-3 py-3 lg:px-5 lg:pl-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center justify-start rtl:justify-end">
@@ -62,7 +63,8 @@ export default function Sidebar({ children }: { children: ReactNode }) {
             </div>
             <div className="flex items-center">
               <div className="flex items-center ms-3">
-                <div>
+                <ModeToggle />
+                <div className="ml-3">
                   <button
                     onClick={() => setMenuOpen(!menuOpen)}
                     type="button"
@@ -149,10 +151,10 @@ export default function Sidebar({ children }: { children: ReactNode }) {
 
       <aside
         id="logo-sidebar"
-        className="fixed top-0 left-0 z-40 w-64 h-screen pt-20 transition-transform -translate-x-full bg-white border-r border-gray-200 sm:translate-x-0 dark:bg-gray-800 dark:border-gray-700"
+        className="fixed top-0 left-0 z-40 w-64 h-screen pt-20 transition-transform -translate-x-full bg-primary-foreground border-r dark:border-gray-700 sm:translate-x-0"
         aria-label="Sidebar"
       >
-        <div className="h-full px-3 pb-4 overflow-y-auto bg-white dark:bg-gray-800">
+        <div className="h-full px-3 pb-4 overflow-y-auto bg-primary-foreground">
           <ul className="space-y-2 font-medium">
             <li>
               <Link
@@ -172,7 +174,7 @@ export default function Sidebar({ children }: { children: ReactNode }) {
                 <span className="ms-3">Dashboard</span>
               </Link>
             </li>
-            <li className="border-b border-gray-600" />
+
             <li>
               <Link
                 href="/suppliers"
@@ -228,7 +230,7 @@ export default function Sidebar({ children }: { children: ReactNode }) {
                 <span className="flex-1 ms-3 whitespace-nowrap">Products</span>
               </Link>
             </li>
-            <li className="border-b border-gray-600" />
+
             <li>
               <Link
                 href="#"
@@ -253,7 +255,7 @@ export default function Sidebar({ children }: { children: ReactNode }) {
               <form action={handleLogout}>
                 <button
                   type="submit"
-                  className="flex items-center p-2 w-full rounded-lg bg-gray-800 dark:text-white dark:hover:bg-gray-700 group"
+                  className="w-full flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
                 >
                   <svg
                     className="flex-shrink-0 w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
@@ -280,7 +282,7 @@ export default function Sidebar({ children }: { children: ReactNode }) {
         </div>
       </aside>
 
-      <div className="p-4 sm:ml-64 mt-14 dark:bg-gray-700 h-[calc(100dvh-3.5rem)]">
+      <div className="p-4 sm:ml-64 mt-16 min-h-[calc(100dvh-4rem)] bg-secondary dark:bg-background">
         {children}
       </div>
     </>

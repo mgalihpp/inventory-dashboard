@@ -12,8 +12,8 @@ export function middleware(req: NextRequest) {
   }
 
   // If token is present, continue to the next middleware or handler
-  return NextResponse.rewrite(new URL("/dashboard", req.url));
-  // return NextResponse.next();
+
+  return NextResponse.next();
 }
 
 // Logging middleware function
@@ -33,8 +33,7 @@ export const config = {
      * - _next/static (static files)
      * - _next/image (image optimization files)
      * - favicon.ico (favicon file)
-     * - auth/login (login page)
      */
-    // "/((?!api|_next/static|_next/image|favicon.ico|auth/login).+)",
+    "/((?!api|_next/static|_next/image|favicon.ico|auth/login|bg-01.jpg).*)",
   ],
 };

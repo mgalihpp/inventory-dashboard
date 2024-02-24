@@ -17,16 +17,20 @@ const ReactApexChart = dynamic(() => import("react-apexcharts"), {
 
 interface SeriesData {
   name: string;
-  data: number[];
+  data: any[];
   color?: string;
 }
 
 interface ChartOptions extends ApexOptions {
   chart: {
-    height: number | string;
-    maxWidth: string | number;
-    fontFamily: string;
-    dropShadow: {
+    sparkline: {
+      enabled: boolean;
+    };
+    height?: number | string;
+    width?: string;
+    maxWidth?: string | number;
+    fontFamily?: string;
+    dropShadow?: {
       enabled: boolean;
     };
     toolbar: {
@@ -57,7 +61,7 @@ interface ApexChartState {
   options: ChartOptions;
 }
 
-class ApexChart extends Component<{}, ApexChartState> {
+class BarChart extends Component<{}, ApexChartState> {
   constructor(props: {}) {
     super(props);
 
@@ -70,76 +74,98 @@ class ApexChart extends Component<{}, ApexChartState> {
     this.state = {
       series: [
         {
-          name: "New users",
-          data: [6500, 6418, 6456, 6526, 6356, 6456],
-          color: "#1A56DB",
+          name: "Income",
+          color: "#31C48D",
+          data: ["1420", "1620", "1820", "1420", "1650", "2120"],
+        },
+        {
+          name: "Expense",
+          data: ["788", "810", "866", "788", "1100", "1200"],
+          color: "#F05252",
         },
       ],
       options: {
         chart: {
-          height: "100%",
-          maxWidth: "100%",
-          type: "area",
-          fontFamily: "Inter, sans-serif",
-          dropShadow: {
+          sparkline: {
             enabled: false,
           },
+          type: "bar",
+          width: "100%",
+          height: 400,
           toolbar: {
             show: false,
           },
         },
         fill: {
-          type: "gradient",
-          gradient: {
-            opacityFrom: 0.55,
-            opacityTo: 0,
-            shade: "#1C64F2",
-            gradientToColors: ["#1C64F2"],
+          opacity: 1,
+        },
+        plotOptions: {
+          bar: {
+            horizontal: true,
+            columnWidth: "100%",
+            borderRadiusApplication: "end",
+            borderRadius: 6,
+            dataLabels: {
+              position: "top",
+            },
           },
         },
-        grid: {
-          show: false,
-          strokeDashArray: 4,
-          padding: {
-            left: 2,
-            right: 2,
-            top: 0,
-          },
+        legend: {
+          show: true,
+          position: "bottom",
         },
         dataLabels: {
           enabled: false,
         },
-        stroke: {
-          width: 6,
-          curve: "smooth",
+        tooltip: {
+          shared: true,
+          intersect: false,
+          x: {
+            formatter(value: number) {
+              return "$" + value;
+            },
+          },
+          z: {
+            formatter(value: number) {
+              return "$" + value;
+            },
+          },
         },
         xaxis: {
-          categories: [
-            "01 February",
-            "02 February",
-            "03 February",
-            "04 February",
-            "05 February",
-            "06 February",
-            "07 February",
-          ],
           labels: {
+            show: true,
+            style: {
+              fontFamily: "Inter, sans-serif",
+              cssClass: "text-xs font-normal fill-gray-500 dark:fill-gray-400",
+            },
+            formatter: function (value) {
+              return "$" + value;
+            },
+          },
+          categories: ["Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+          axisTicks: {
             show: false,
           },
           axisBorder: {
             show: false,
           },
-          axisTicks: {
-            show: false,
-          },
         },
         yaxis: {
-          show: false,
+          labels: {
+            show: true,
+            style: {
+              fontFamily: "Inter, sans-serif",
+              cssClass: "text-xs font-normal fill-gray-500 dark:fill-gray-400",
+            },
+          },
         },
-        tooltip: {
-          enabled: true,
-          x: {
-            show: false,
+        grid: {
+          show: true,
+          strokeDashArray: 4,
+          padding: {
+            left: 2,
+            right: 2,
+            top: -20,
           },
         },
         theme: {
@@ -167,4 +193,4 @@ class ApexChart extends Component<{}, ApexChartState> {
   }
 }
 
-export default ApexChart;
+export default BarChart;

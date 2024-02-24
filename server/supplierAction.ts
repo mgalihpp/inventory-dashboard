@@ -61,6 +61,26 @@ export async function getAllSupplier(
 
 type ExtendedSupplier = Omit<Supplier, "id">;
 
+export async function getSupplierById(supplierId: string) {
+  try {
+    const user = await prisma.supplier.findFirst({
+      where: {
+        id: supplierId,
+      },
+    });
+
+    if (!user) {
+      return { error: "Supplier not found" }; // Return an error object
+    }
+
+    return user;
+  } catch (error) {
+    console.error("Error fetching supplier:", error);
+    // Handle error
+    return { error: "Internal Server Error" }; // Return an error object
+  }
+}
+
 export async function AddNewSupplier({
   supplier,
 }: {
@@ -80,6 +100,42 @@ export async function AddNewSupplier({
     return { success: true };
   } catch (error) {
     console.error("Error creating user:", error);
+    // Handle error
+    return { error: "Internal Server Error" };
+  }
+}
+
+export async function EditSupplier({
+  supplier,
+  supplierId,
+}: {
+  supplier: ExtendedSupplier;
+  supplierId: string;
+}) {
+  try {
+    const { name, address, phone } = supplier;
+
+    const isSupplier = await prisma.supplier.findFirst({
+      where: {
+        id: supplierId,
+      },
+    });
+
+    if (!isSupplier) return { error: "Supplier not found" };
+
+    await prisma.supplier.update({
+      where: {
+        id: isSupplier.id,
+      },
+      data: {
+        name: name ?? isSupplier.name,
+        address: address ?? isSupplier.address,
+        phone: phone ?? isSupplier.phone,
+      },
+    });
+    return { success: true };
+  } catch (error) {
+    console.error("Error updating supplier:", error);
     // Handle error
     return { error: "Internal Server Error" };
   }

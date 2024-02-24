@@ -1,7 +1,8 @@
 import { User } from "@prisma/client";
-import { Info, PencilLine } from "lucide-react";
+import { Info } from "lucide-react";
 import DeleteButton from "../button/deletebtn";
 import { DeleteUser } from "@/server/userAction";
+import EditButton from "../modal/edit/edituser";
 
 interface TableProps {
   users: User[];
@@ -105,13 +106,7 @@ export default function UserTable({ users }: TableProps) {
                 <td className="px-6 py-4">{user.role}</td>
                 <td className="px-6 py-4 text-right">
                   <div className="flex items-center justify-center gap-4">
-                    <button
-                      className="flex items-center gap-2 font-medium bg-blue-500 
-                    text-white px-4 py-2 rounded-md hover:bg-blue-600"
-                    >
-                      <PencilLine className="w-4 h-4" />
-                      Edit
-                    </button>
+                    <EditButton userId={user.id} />
                     <button
                       className="flex items-center gap-2 font-medium bg-yellow-500 
                     text-white px-4 py-2 rounded-md hover:bg-yellow-600"

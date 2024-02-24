@@ -54,12 +54,32 @@ export async function getAllProduct(
       totalCount: totalSupplierCount,
     };
   } catch (error) {
-    console.error("Error fetching users:", error);
-    throw new Error("Failed to fetch users");
+    console.error("Error fetching product:", error);
+    throw new Error("Failed to fetch product");
   }
 }
 
 type ExtendedProduct = Omit<Product, "id">;
+
+export async function getProductById(productId: string) {
+  try {
+    const user = await prisma.product.findFirst({
+      where: {
+        id: productId,
+      },
+    });
+
+    if (!user) {
+      return { error: "Product not found" }; // Return an error object
+    }
+
+    return user;
+  } catch (error) {
+    console.error("Error fetching product:", error);
+    // Handle error
+    return { error: "Internal Server Error" }; // Return an error object
+  }
+}
 
 export async function AddNewProduct({ product }: { product: ExtendedProduct }) {
   try {
@@ -75,10 +95,48 @@ export async function AddNewProduct({ product }: { product: ExtendedProduct }) {
       },
     });
 
-    // Handle successful user creation
+    // Handle successful product creation
     return { success: true };
   } catch (error) {
     console.error("Error creating user:", error);
+    // Handle error
+    return { error: "Internal Server Error" };
+  }
+}
+
+export async function EditProduct({
+  product,
+  productId,
+}: {
+  product: ExtendedProduct;
+  productId: string;
+}) {
+  try {
+    const { name, category, qty, price, status } = product;
+
+    const isProduct = await prisma.product.findFirst({
+      where: {
+        id: productId,
+      },
+    });
+
+    if (!isProduct) return { error: "Product not found" };
+
+    await prisma.product.update({
+      where: {
+        id: isProduct.id,
+      },
+      data: {
+        name: name ?? isProduct.name,
+        category: category ?? isProduct.category,
+        qty: qty ?? isProduct.qty,
+        price: price ?? isProduct.price,
+        status: status ?? isProduct.status,
+      },
+    });
+    return { success: true };
+  } catch (error) {
+    console.error("Error updating product:", error);
     // Handle error
     return { error: "Internal Server Error" };
   }

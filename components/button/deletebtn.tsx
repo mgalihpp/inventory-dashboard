@@ -1,6 +1,6 @@
 "use client";
 
-import { useServerAction } from "@/hooks/useServerActions";
+import { useServerAction } from "@/hooks/useServerAction";
 import { Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";

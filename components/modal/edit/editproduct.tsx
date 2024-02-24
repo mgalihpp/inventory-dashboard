@@ -1,25 +1,50 @@
 "use client";
 
-import { ChangeEvent, useState } from "react";
-import { UploadIcon } from "lucide-react";
-import { User } from "@prisma/client";
+import {
+  ChangeEvent,
+  Dispatch,
+  SetStateAction,
+  useEffect,
+  useState,
+} from "react";
+import { PencilLine } from "lucide-react";
+import { Product } from "@prisma/client";
 import { useServerAction } from "@/hooks/useServerAction";
-import { AddNewUser } from "@/server/userAction";
+import { EditProduct, getProductById } from "@/server/productAction";
 import { useRouter } from "next/navigation";
+import { useServerFetch } from "@/hooks/useServerFetch";
 
-type ExtendedUser = Omit<User, "id">;
+type ExtendedProduct = Omit<Product, "id">;
 
-export default function AddUser() {
-  const [open, setOpen] = useState(false);
+interface DialogState {
+  [productId: string]: boolean;
+}
 
-  const [user, setUser] = useState<ExtendedUser>({
-    fullname: "",
-    username: "",
-    email: "",
-    password: "",
-    avatar: "",
-    address: "",
-    role: "CUSTOMER",
+export default function EditButton({ productId }: { productId: string }) {
+  const [open, setOpen] = useState<DialogState>({});
+
+  // Function to open dialog for a specific
+  const openDialog = (productId: string) => {
+    setOpen((prevOpen) => ({
+      ...prevOpen,
+      [productId]: true,
+    }));
+  };
+
+  // Function to close dialog for a specific
+  const closeDialog = (productId: string) => {
+    setOpen((prevOpen) => ({
+      ...prevOpen,
+      [productId]: false,
+    }));
+  };
+
+  const [product, setProduct] = useState<ExtendedProduct>({
+    name: "",
+    category: "drink",
+    price: 0,
+    qty: 0,
+    status: "AVAILABLE",
   });
 
   const [error, setError] = useState("");
@@ -29,32 +54,45 @@ export default function AddUser() {
   ) => {
     const { name, value } = e.target;
 
-    // Update the user state based on the input field name
-    setUser((prevUser) => ({
-      ...prevUser,
-      [name]: value,
-    }));
+    // Check if the name is either "qty" or "price"
+    if (name === "qty" || name === "price") {
+      // Parse the value to ensure it's a number
+      const numericValue = parseFloat(value);
+      // Update the state only if the parsed value is a valid number
+      if (!isNaN(numericValue)) {
+        setProduct((prevProduct) => ({
+          ...prevProduct,
+          [name]: numericValue,
+        }));
+      } else {
+        // Handle invalid input
+      }
+    } else {
+      // For other fields, update the state as usual
+      setProduct((prevProduct) => ({
+        ...prevProduct,
+        [name]: value,
+      }));
+    }
   };
 
   const router = useRouter();
 
-  const [runAction, isRunning] = useServerAction(AddNewUser);
+  const [runAction, isRunning] = useServerAction(EditProduct);
 
   const handleSubmit = async () => {
     try {
-      await runAction({ user }).then((result) => {
+      await runAction({ product, productId }).then((result) => {
         if (result.success) {
-          setUser({
-            fullname: "",
-            username: "",
-            email: "",
-            password: "",
-            avatar: "",
-            address: "",
-            role: "CUSTOMER",
+          setProduct({
+            name: "",
+            category: "drink",
+            price: 0,
+            qty: 0,
+            status: "AVAILABLE",
           });
 
-          setOpen(false);
+          closeDialog(productId);
 
           router.refresh();
         } else {
@@ -67,21 +105,86 @@ export default function AddUser() {
     }
   };
 
+  const props = {
+    closeDialog,
+    handleChange,
+    handleSubmit,
+    open,
+    error,
+    setError,
+    productId,
+    product,
+    setProduct,
+    isRunning,
+  };
+
   return (
     <>
       {/* <!-- Modal toggle --> */}
       <button
-        onClick={() => setOpen(true)}
+        onClick={() => openDialog(productId)}
         data-modal-target="crud-modal"
         data-modal-toggle="crud-modal"
-        className="flex items-center gap-2 justify-center text-white bg-green-500 hover:bg-green-600 focus:ring-2 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800"
+        className="flex items-center gap-2 font-medium bg-blue-500 
+        text-white px-4 py-2 rounded-md hover:bg-blue-600"
         type="button"
       >
-        <UploadIcon className="w-4 h-4" />
-        Add Data
+        <PencilLine className="w-4 h-4" />
+        Edit
       </button>
 
-      {open && (
+      <MainModal {...props} />
+    </>
+  );
+}
+
+function MainModal({
+  open,
+  productId,
+  error,
+  setError,
+  closeDialog,
+  handleSubmit,
+  handleChange,
+  product,
+  setProduct,
+  isRunning,
+}: {
+  open: DialogState;
+  productId: string;
+  error: string;
+  product: ExtendedProduct;
+  setProduct: Dispatch<SetStateAction<ExtendedProduct>>;
+  setError: Dispatch<SetStateAction<string>>;
+  closeDialog: (productId: string) => void;
+  handleSubmit: (formdata: FormData) => void;
+  handleChange: (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => void;
+  isRunning: boolean;
+}) {
+  const [fetchData] = useServerFetch(
+    async () => {
+      const result = await getProductById(productId);
+
+      return result;
+    },
+    (result) => {
+      if ("error" in result) {
+        setError(result.error);
+      } else {
+        setProduct(result);
+      }
+    }
+  );
+
+  useEffect(() => {
+    if (open[productId]) {
+      fetchData();
+    }
+  }, [open]);
+
+  return (
+    <>
+      {open[productId] && (
         <>
           {/* <!-- Overlay --> */}
           <div className="fixed top-0 left-0 w-full h-full bg-black opacity-50 z-50"></div>
@@ -99,10 +202,10 @@ export default function AddUser() {
                 {/* <!-- Modal header --> */}
                 <div className="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600">
                   <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                    Create New User
+                    Update Product
                   </h3>
                   <button
-                    onClick={() => setOpen(false)}
+                    onClick={() => closeDialog(productId)}
                     type="button"
                     className="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
                     data-modal-toggle="crud-modal"
@@ -128,121 +231,100 @@ export default function AddUser() {
                 {/* <!-- Modal body --> */}
                 <form className="p-4 md:p-5" action={handleSubmit}>
                   <div className="grid gap-4 mb-4 grid-cols-2">
-                    <div className="col-span-2">
+                    <div className="col-span-2  text-left">
                       <label
-                        htmlFor="fullname"
+                        htmlFor="name"
                         className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
                       >
-                        Fullname
+                        Name
                       </label>
                       <input
                         type="text"
-                        name="fullname"
-                        id="fullname"
+                        name="name"
+                        id="name"
                         className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                        placeholder="User fullname"
+                        placeholder="Product name"
+                        value={product.name ?? ""}
                         onChange={handleChange}
                         required
                       />
                     </div>
-                    <div className="col-span-2">
+
+                    <div className="col-span-2  text-left sm:col-span-1">
                       <label
-                        htmlFor="email"
+                        htmlFor="status"
                         className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
                       >
-                        Email
-                      </label>
-                      <input
-                        type="email"
-                        name="email"
-                        id="email"
-                        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                        onChange={handleChange}
-                        placeholder="User email"
-                        required
-                      />
-                    </div>
-                    <div className="col-span-2">
-                      <label
-                        htmlFor="password"
-                        className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-                      >
-                        Password
-                      </label>
-                      <input
-                        type="password"
-                        name="password"
-                        id="password"
-                        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                        onChange={handleChange}
-                        placeholder="User password"
-                        required
-                      />
-                    </div>
-                    <div className="col-span-2 sm:col-span-1">
-                      <label
-                        htmlFor="username"
-                        className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-                      >
-                        Username
-                      </label>
-                      <input
-                        type="text"
-                        name="username"
-                        id="username"
-                        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                        onChange={handleChange}
-                        placeholder="User username"
-                        required
-                      />
-                    </div>
-                    <div className="col-span-2 sm:col-span-1">
-                      <label
-                        htmlFor="role"
-                        className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-                      >
-                        Role
+                        Status
                       </label>
                       <select
-                        id="role"
-                        name="role"
+                        id="status"
+                        name="status"
+                        value={product.status}
                         onChange={handleChange}
                         className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                       >
-                        <option>Select role</option>
-                        <option value="ADMIN">Admin</option>
-                        <option value="CUSTOMER">Customer</option>
+                        <option>Select status</option>
+                        <option value="AVAILABLE">AVAILABLE</option>
+                        <option value="NOT_AVAILABLE">NOT AVAILABLE</option>
                       </select>
                     </div>
-                    <div className="col-span-2">
+                    <div className="col-span-2  text-left sm:col-span-1">
                       <label
-                        htmlFor="address"
+                        htmlFor="category"
                         className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
                       >
-                        Address
+                        Category
+                      </label>
+                      <select
+                        id="category"
+                        name="category"
+                        value={product.category}
+                        onChange={handleChange}
+                        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                      >
+                        <option>Select category</option>
+                        <option value="food">Food</option>
+                        <option value="drink">Drink</option>
+                        <option value="medicine">Medicine</option>
+                        <option value="herbs">Herbs</option>
+                        <option value="household_equipment">
+                          Household Equipment
+                        </option>
+                      </select>
+                    </div>
+                    <div className="col-span-2  text-left">
+                      <label
+                        htmlFor="qty"
+                        className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                      >
+                        Quantity
                       </label>
                       <input
-                        id="address"
-                        name="address"
+                        id="qty"
+                        type="number"
+                        name="qty"
+                        value={product.qty ?? ""}
                         onChange={handleChange}
                         className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                        placeholder="User address"
+                        placeholder="Product qty"
                       />
                     </div>
-                    <div className="col-span-2">
+                    <div className="col-span-2  text-left">
                       <label
-                        htmlFor="avatar"
+                        htmlFor="price"
                         className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
                       >
-                        Avatar
+                        Price $
                       </label>
                       <input
-                        type="file"
-                        id="avatar"
-                        name="avatar"
+                        id="price"
+                        name="price"
+                        type="number"
+                        value={product.price ?? ""}
                         onChange={handleChange}
                         className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                        placeholder="User avatar"
+                        placeholder="Product price"
                       />
                     </div>
                   </div>
@@ -270,7 +352,7 @@ export default function AddUser() {
                         clipRule="evenodd"
                       ></path>
                     </svg>
-                    Add new user
+                    Update
                   </button>
                 </form>
               </div>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useServerAction } from "@/hooks/useServerActions";
+import { useServerAction } from "@/hooks/useServerAction";
 import { LoginAction } from "@/server/authActions";
 import { hasCookie } from "cookies-next";
 import Image from "next/image";
@@ -49,7 +49,7 @@ export default function Login() {
     <div className="w-full">
       <div className="w-full h-dvh m-0 flex flex-wrap items-center justify-center bg-primary">
         <div
-          className="w-full overflow-hidden bg-[#fff] flex flex-wrap items-stretch 
+          className="w-full overflow-hidden bg-background flex flex-wrap items-stretch 
         flex-row-reverse"
         >
           <form
@@ -65,7 +65,7 @@ export default function Login() {
               Email
               <input
                 type="email"
-                className="border p-2 rounded-md"
+                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                 id="email"
                 aria-describedby="emailHelp"
                 name="email"
@@ -79,7 +79,7 @@ export default function Login() {
               Password
               <input
                 type="password"
-                className="border p-2 rounded-md"
+                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                 id="password"
                 placeholder="Password"
                 name="password"
@@ -105,11 +105,12 @@ export default function Login() {
 
           <div className="w-[50%] h-dvh relative hidden md:flex items-center justify-center p-6 bg-[#f2f2f2]">
             <Image
-              src="https://tecdn.b-cdn.net/img/Photos/new-templates/bootstrap-login-form/draw2.webp"
+              src="/bg-01.jpg"
               alt="brand"
-              width={500}
-              height={500}
+              fill
+              fetchPriority="high"
               objectFit="cover"
+              priority
             />
           </div>
         </div>

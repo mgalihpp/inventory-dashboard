@@ -17,16 +17,16 @@ const ReactApexChart = dynamic(() => import("react-apexcharts"), {
 
 interface SeriesData {
   name: string;
-  data: number[];
+  data: any[];
   color?: string;
 }
 
 interface ChartOptions extends ApexOptions {
   chart: {
-    height: number | string;
-    maxWidth: string | number;
+    height?: number | string;
+    maxWidth?: string | number;
     fontFamily: string;
-    dropShadow: {
+    dropShadow?: {
       enabled: boolean;
     };
     toolbar: {
@@ -57,7 +57,7 @@ interface ApexChartState {
   options: ChartOptions;
 }
 
-class ApexChart extends Component<{}, ApexChartState> {
+class ColumnApexChart extends Component<{}, ApexChartState> {
   constructor(props: {}) {
     super(props);
 
@@ -70,32 +70,70 @@ class ApexChart extends Component<{}, ApexChartState> {
     this.state = {
       series: [
         {
-          name: "New users",
-          data: [6500, 6418, 6456, 6526, 6356, 6456],
+          name: "Organic",
           color: "#1A56DB",
+          data: [
+            { x: "Mon", y: 231 },
+            { x: "Tue", y: 122 },
+            { x: "Wed", y: 63 },
+            { x: "Thu", y: 421 },
+            { x: "Fri", y: 122 },
+            { x: "Sat", y: 323 },
+            { x: "Sun", y: 111 },
+          ],
+        },
+        {
+          name: "Social media",
+          color: "#FDBA8C",
+          data: [
+            { x: "Mon", y: 232 },
+            { x: "Tue", y: 113 },
+            { x: "Wed", y: 341 },
+            { x: "Thu", y: 224 },
+            { x: "Fri", y: 522 },
+            { x: "Sat", y: 411 },
+            { x: "Sun", y: 243 },
+          ],
         },
       ],
       options: {
+        colors: ["#1A56DB", "#FDBA8C"],
+
         chart: {
-          height: "100%",
-          maxWidth: "100%",
-          type: "area",
+          type: "bar",
+          height: "320px",
           fontFamily: "Inter, sans-serif",
-          dropShadow: {
-            enabled: false,
-          },
           toolbar: {
             show: false,
           },
         },
-        fill: {
-          type: "gradient",
-          gradient: {
-            opacityFrom: 0.55,
-            opacityTo: 0,
-            shade: "#1C64F2",
-            gradientToColors: ["#1C64F2"],
+        plotOptions: {
+          bar: {
+            horizontal: false,
+            columnWidth: "70%",
+            borderRadiusApplication: "end",
+            borderRadius: 8,
           },
+        },
+        tooltip: {
+          shared: true,
+          intersect: false,
+          style: {
+            fontFamily: "Inter, sans-serif",
+          },
+        },
+        states: {
+          hover: {
+            filter: {
+              type: "darken",
+              value: 1,
+            },
+          },
+        },
+        stroke: {
+          show: true,
+          width: 0,
+          colors: ["transparent"],
         },
         grid: {
           show: false,
@@ -103,28 +141,23 @@ class ApexChart extends Component<{}, ApexChartState> {
           padding: {
             left: 2,
             right: 2,
-            top: 0,
+            top: -14,
           },
         },
         dataLabels: {
           enabled: false,
         },
-        stroke: {
-          width: 6,
-          curve: "smooth",
+        legend: {
+          show: false,
         },
         xaxis: {
-          categories: [
-            "01 February",
-            "02 February",
-            "03 February",
-            "04 February",
-            "05 February",
-            "06 February",
-            "07 February",
-          ],
+          floating: false,
           labels: {
-            show: false,
+            show: true,
+            style: {
+              fontFamily: "Inter, sans-serif",
+              cssClass: "text-xs font-normal fill-gray-500 dark:fill-gray-400",
+            },
           },
           axisBorder: {
             show: false,
@@ -136,11 +169,8 @@ class ApexChart extends Component<{}, ApexChartState> {
         yaxis: {
           show: false,
         },
-        tooltip: {
-          enabled: true,
-          x: {
-            show: false,
-          },
+        fill: {
+          opacity: 1,
         },
         theme: {
           mode: savedThemeMode === "light" ? "light" : "dark",
@@ -167,4 +197,4 @@ class ApexChart extends Component<{}, ApexChartState> {
   }
 }
 
-export default ApexChart;
+export default ColumnApexChart;

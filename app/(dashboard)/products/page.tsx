@@ -2,6 +2,7 @@ import AddProduct from "@/components/modal/create/addproduct";
 import ProductTable from "@/components/table/producttable";
 import { getAllProduct } from "@/server/productAction";
 import { Metadata } from "next";
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Products",

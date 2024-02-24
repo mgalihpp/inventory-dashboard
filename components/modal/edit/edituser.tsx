@@ -1,16 +1,43 @@
 "use client";
 
-import { ChangeEvent, useState } from "react";
-import { UploadIcon } from "lucide-react";
+import {
+  ChangeEvent,
+  Dispatch,
+  SetStateAction,
+  useEffect,
+  useState,
+} from "react";
+import { PencilLine } from "lucide-react";
 import { User } from "@prisma/client";
 import { useServerAction } from "@/hooks/useServerAction";
-import { AddNewUser } from "@/server/userAction";
+import { EditUser, getUserById } from "@/server/userAction";
 import { useRouter } from "next/navigation";
+import { useServerFetch } from "@/hooks/useServerFetch";
 
 type ExtendedUser = Omit<User, "id">;
 
-export default function AddUser() {
-  const [open, setOpen] = useState(false);
+interface DialogState {
+  [userId: string]: boolean;
+}
+
+export default function EditButton({ userId }: { userId: string }) {
+  const [open, setOpen] = useState<DialogState>({});
+
+  // Function to open dialog for a specific
+  const openDialog = (userId: string) => {
+    setOpen((prevOpen) => ({
+      ...prevOpen,
+      [userId]: true,
+    }));
+  };
+
+  // Function to close dialog for a specific
+  const closeDialog = (userId: string) => {
+    setOpen((prevOpen) => ({
+      ...prevOpen,
+      [userId]: false,
+    }));
+  };
 
   const [user, setUser] = useState<ExtendedUser>({
     fullname: "",
@@ -38,11 +65,11 @@ export default function AddUser() {
 
   const router = useRouter();
 
-  const [runAction, isRunning] = useServerAction(AddNewUser);
+  const [runAction, isRunning] = useServerAction(EditUser);
 
   const handleSubmit = async () => {
     try {
-      await runAction({ user }).then((result) => {
+      await runAction({ user, userId }).then((result) => {
         if (result.success) {
           setUser({
             fullname: "",
@@ -54,7 +81,7 @@ export default function AddUser() {
             role: "CUSTOMER",
           });
 
-          setOpen(false);
+          closeDialog(userId);
 
           router.refresh();
         } else {
@@ -67,21 +94,86 @@ export default function AddUser() {
     }
   };
 
+  const props = {
+    closeDialog,
+    handleChange,
+    handleSubmit,
+    open,
+    error,
+    setError,
+    userId,
+    user,
+    setUser,
+    isRunning,
+  };
+
   return (
     <>
       {/* <!-- Modal toggle --> */}
       <button
-        onClick={() => setOpen(true)}
+        onClick={() => openDialog(userId)}
         data-modal-target="crud-modal"
         data-modal-toggle="crud-modal"
-        className="flex items-center gap-2 justify-center text-white bg-green-500 hover:bg-green-600 focus:ring-2 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800"
+        className="flex items-center gap-2 font-medium bg-blue-500 
+        text-white px-4 py-2 rounded-md hover:bg-blue-600"
         type="button"
       >
-        <UploadIcon className="w-4 h-4" />
-        Add Data
+        <PencilLine className="w-4 h-4" />
+        Edit
       </button>
 
-      {open && (
+      <MainModal {...props} />
+    </>
+  );
+}
+
+function MainModal({
+  open,
+  userId,
+  error,
+  setError,
+  closeDialog,
+  handleSubmit,
+  handleChange,
+  user,
+  setUser,
+  isRunning,
+}: {
+  open: DialogState;
+  userId: string;
+  error: string;
+  user: ExtendedUser;
+  setUser: Dispatch<SetStateAction<ExtendedUser>>;
+  setError: Dispatch<SetStateAction<string>>;
+  closeDialog: (userId: string) => void;
+  handleSubmit: (formdata: FormData) => void;
+  handleChange: (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => void;
+  isRunning: boolean;
+}) {
+  const [fetchData] = useServerFetch(
+    async () => {
+      const result = await getUserById(userId);
+
+      return result;
+    },
+    (result) => {
+      if ("error" in result) {
+        setError(result.error);
+      } else {
+        setUser(result);
+      }
+    }
+  );
+
+  useEffect(() => {
+    if (open[userId]) {
+      fetchData();
+    }
+  }, [open]);
+
+  return (
+    <>
+      {open[userId] && (
         <>
           {/* <!-- Overlay --> */}
           <div className="fixed top-0 left-0 w-full h-full bg-black opacity-50 z-50"></div>
@@ -99,10 +191,10 @@ export default function AddUser() {
                 {/* <!-- Modal header --> */}
                 <div className="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600">
                   <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                    Create New User
+                    Update User
                   </h3>
                   <button
-                    onClick={() => setOpen(false)}
+                    onClick={() => closeDialog(userId)}
                     type="button"
                     className="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
                     data-modal-toggle="crud-modal"
@@ -128,7 +220,7 @@ export default function AddUser() {
                 {/* <!-- Modal body --> */}
                 <form className="p-4 md:p-5" action={handleSubmit}>
                   <div className="grid gap-4 mb-4 grid-cols-2">
-                    <div className="col-span-2">
+                    <div className="col-span-2  text-left">
                       <label
                         htmlFor="fullname"
                         className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
@@ -141,11 +233,12 @@ export default function AddUser() {
                         id="fullname"
                         className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                         placeholder="User fullname"
+                        value={user.fullname ?? ""}
                         onChange={handleChange}
                         required
                       />
                     </div>
-                    <div className="col-span-2">
+                    <div className="col-span-2  text-left">
                       <label
                         htmlFor="email"
                         className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
@@ -157,12 +250,13 @@ export default function AddUser() {
                         name="email"
                         id="email"
                         className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                        value={user.email ?? ""}
                         onChange={handleChange}
                         placeholder="User email"
                         required
                       />
                     </div>
-                    <div className="col-span-2">
+                    <div className="col-span-2  text-left">
                       <label
                         htmlFor="password"
                         className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
@@ -174,12 +268,13 @@ export default function AddUser() {
                         name="password"
                         id="password"
                         className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                        value={user.password ?? ""}
                         onChange={handleChange}
                         placeholder="User password"
                         required
                       />
                     </div>
-                    <div className="col-span-2 sm:col-span-1">
+                    <div className="col-span-2  text-left sm:col-span-1">
                       <label
                         htmlFor="username"
                         className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
@@ -191,12 +286,13 @@ export default function AddUser() {
                         name="username"
                         id="username"
                         className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                        value={user.username ?? ""}
                         onChange={handleChange}
                         placeholder="User username"
                         required
                       />
                     </div>
-                    <div className="col-span-2 sm:col-span-1">
+                    <div className="col-span-2  text-left sm:col-span-1">
                       <label
                         htmlFor="role"
                         className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
@@ -206,6 +302,7 @@ export default function AddUser() {
                       <select
                         id="role"
                         name="role"
+                        value={user.role}
                         onChange={handleChange}
                         className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                       >
@@ -214,7 +311,7 @@ export default function AddUser() {
                         <option value="CUSTOMER">Customer</option>
                       </select>
                     </div>
-                    <div className="col-span-2">
+                    <div className="col-span-2  text-left">
                       <label
                         htmlFor="address"
                         className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
@@ -224,12 +321,13 @@ export default function AddUser() {
                       <input
                         id="address"
                         name="address"
+                        value={user.address ?? ""}
                         onChange={handleChange}
                         className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                         placeholder="User address"
                       />
                     </div>
-                    <div className="col-span-2">
+                    <div className="col-span-2  text-left">
                       <label
                         htmlFor="avatar"
                         className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
@@ -270,7 +368,7 @@ export default function AddUser() {
                         clipRule="evenodd"
                       ></path>
                     </svg>
-                    Add new user
+                    Update
                   </button>
                 </form>
               </div>

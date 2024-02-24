@@ -2,6 +2,7 @@ import AddUser from "@/components/modal/create/adduser";
 import UserTable from "@/components/table/usertable";
 import { getAllUser } from "@/server/userAction";
 import { Metadata } from "next";
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Users",

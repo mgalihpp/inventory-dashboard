@@ -3,7 +3,7 @@
 import { ChangeEvent, useState } from "react";
 import { UploadIcon } from "lucide-react";
 import { Product } from "@prisma/client";
-import { useServerAction } from "@/hooks/useServerActions";
+import { useServerAction } from "@/hooks/useServerAction";
 import { useRouter } from "next/navigation";
 import { AddNewProduct } from "@/server/productAction";
 
@@ -87,7 +87,7 @@ export default function AddProduct() {
         onClick={() => setOpen(true)}
         data-modal-target="crud-modal"
         data-modal-toggle="crud-modal"
-        className="flex items-center gap-2 justify-center text-white bg-green-700 hover:bg-green-800 focus:ring-2 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800"
+        className="flex items-center gap-2 justify-center text-white bg-green-500 hover:bg-green-600 focus:ring-2 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800"
         type="button"
       >
         <UploadIcon className="w-4 h-4" />
