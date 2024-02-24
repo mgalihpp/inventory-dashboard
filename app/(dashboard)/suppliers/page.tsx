@@ -1,7 +1,7 @@
-import AddSupplier from "@/components/modal/create/addsupplier";
-import SupplierTable from "@/components/table/suppliertable";
+import SupplierTable from "./table";
 import { getAllSupplier } from "@/server/supplierAction";
 import { Metadata } from "next";
+import { AddSupplierDialog } from "./dialog";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
@@ -16,14 +16,11 @@ export default async function SupplierDashboard() {
       <div className="flex justify-between">
         <h1 className="text-2xl font-semibold dark:text-white">Suppliers</h1>
 
-        <AddSupplier />
+        <AddSupplierDialog />
       </div>
 
       <div className="w-full mt-12">
-        <SupplierTable
-          suppliers={data.suppliers}
-          totalCount={data.totalCount}
-        />
+        <SupplierTable data={data.suppliers} />
       </div>
     </>
   );

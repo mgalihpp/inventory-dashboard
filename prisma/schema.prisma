@@ -19,14 +19,16 @@ enum Role {
 }
 
 model User {
-  id       String  @id @default(auto()) @map("_id") @db.ObjectId
-  fullname String?
-  username String?
-  email    String  @unique
-  password String
-  avatar   String?
-  role     Role
-  address  String?
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  fullname  String?
+  username  String?
+  email     String   @unique
+  password  String
+  avatar    String?
+  role      Role
+  address   String?
+  createdAt DateTime @default(now())
+  updateAt  DateTime @updatedAt
 }
 
 enum Category {
@@ -43,24 +45,30 @@ enum Status {
 }
 
 model Customer {
-  id      String @id @default(auto()) @map("_id") @db.ObjectId
-  name    String
-  address String
-  phone   String
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  name      String
+  address   String
+  phone     String
+  createdAt DateTime @default(now())
+  updateAt  DateTime @updatedAt
 }
 
 model Supplier {
-  id      String @id @default(auto()) @map("_id") @db.ObjectId
-  name    String
-  address String
-  phone   String
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  name      String
+  address   String
+  phone     String
+  createdAt DateTime @default(now())
+  updateAt  DateTime @updatedAt
 }
 
 model Product {
-  id       String   @id @default(auto()) @map("_id") @db.ObjectId
-  name     String
-  category Category
-  qty      Int
-  price    Int
-  status   Status
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  name      String
+  category  Category
+  qty       Int
+  price     Int
+  status    Status
+  createdAt DateTime @default(now())
+  updateAt  DateTime @updatedAt
 }

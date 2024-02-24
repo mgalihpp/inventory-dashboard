@@ -27,6 +27,7 @@ export default function Sidebar({ children }: { children: ReactNode }) {
           <div className="flex items-center justify-between">
             <div className="flex items-center justify-start rtl:justify-end">
               <button
+                onClick={() => setSidebarOpen(!sidebarOpen)}
                 data-drawer-target="logo-sidebar"
                 data-drawer-toggle="logo-sidebar"
                 aria-controls="logo-sidebar"
@@ -151,7 +152,9 @@ export default function Sidebar({ children }: { children: ReactNode }) {
 
       <aside
         id="logo-sidebar"
-        className="fixed top-0 left-0 z-40 w-64 h-screen pt-20 transition-transform -translate-x-full bg-primary-foreground border-r dark:border-gray-700 sm:translate-x-0"
+        className={`fixed top-0 left-0 z-40 w-64 h-screen pt-20 transition-transform ${
+          sidebarOpen ? "translate-x-0" : "-translate-x-full"
+        } bg-primary-foreground border-r dark:border-gray-700 sm:translate-x-0`}
         aria-label="Sidebar"
       >
         <div className="h-full px-3 pb-4 overflow-y-auto bg-primary-foreground">

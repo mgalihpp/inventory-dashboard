@@ -1,7 +1,7 @@
-import AddUser from "@/components/modal/create/adduser";
-import UserTable from "@/components/table/usertable";
+import UserTable from "./table";
 import { getAllUser } from "@/server/userAction";
 import { Metadata } from "next";
+import { AddUserDialog } from "./dialog";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
@@ -16,11 +16,11 @@ export default async function UserDashboard() {
       <div className="flex justify-between">
         <h1 className="text-2xl font-semibold dark:text-white">Users</h1>
 
-        <AddUser />
+        <AddUserDialog />
       </div>
 
       <div className="w-full mt-12">
-        <UserTable users={data.users} totalCount={data.totalCount} />
+        <UserTable data={data.users} />
       </div>
     </>
   );

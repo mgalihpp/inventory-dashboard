@@ -1,7 +1,7 @@
 "use server";
 
 import prisma from "@/lib/db";
-import { Supplier } from "@prisma/client";
+import { Supplier, SupplierWithId } from "@/types/supplier";
 
 interface GetAllSupplierOptions {
   page?: number;
@@ -15,7 +15,7 @@ interface GetAllSupplierOptions {
 }
 
 interface GetAllSupplierResult {
-  suppliers: Supplier[];
+  suppliers: SupplierWithId[];
   totalCount: number;
 }
 
@@ -59,8 +59,6 @@ export async function getAllSupplier(
   }
 }
 
-type ExtendedSupplier = Omit<Supplier, "id">;
-
 export async function getSupplierById(supplierId: string) {
   try {
     const user = await prisma.supplier.findFirst({
@@ -81,11 +79,7 @@ export async function getSupplierById(supplierId: string) {
   }
 }
 
-export async function AddNewSupplier({
-  supplier,
-}: {
-  supplier: ExtendedSupplier;
-}) {
+export async function AddNewSupplier({ supplier }: { supplier: Supplier }) {
   try {
     const { name, address, phone } = supplier;
 
@@ -109,7 +103,7 @@ export async function EditSupplier({
   supplier,
   supplierId,
 }: {
-  supplier: ExtendedSupplier;
+  supplier: Supplier;
   supplierId: string;
 }) {
   try {

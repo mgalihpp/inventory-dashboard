@@ -1,7 +1,7 @@
 "use server";
 
 import prisma from "@/lib/db";
-import { Product } from "@prisma/client";
+import { Product, ProductWithId } from "@/types/product";
 
 interface GetAllProductOptions {
   page?: number;
@@ -15,7 +15,7 @@ interface GetAllProductOptions {
 }
 
 interface GetAllProductResult {
-  products: Product[];
+  products: ProductWithId[];
   totalCount: number;
 }
 
@@ -59,8 +59,6 @@ export async function getAllProduct(
   }
 }
 
-type ExtendedProduct = Omit<Product, "id">;
-
 export async function getProductById(productId: string) {
   try {
     const user = await prisma.product.findFirst({
@@ -81,7 +79,7 @@ export async function getProductById(productId: string) {
   }
 }
 
-export async function AddNewProduct({ product }: { product: ExtendedProduct }) {
+export async function AddNewProduct({ product }: { product: Product }) {
   try {
     const { name, category, qty, price, status } = product;
 
@@ -108,7 +106,7 @@ export async function EditProduct({
   product,
   productId,
 }: {
-  product: ExtendedProduct;
+  product: Product;
   productId: string;
 }) {
   try {

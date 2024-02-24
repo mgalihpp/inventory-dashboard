@@ -1,7 +1,8 @@
 "use server";
 
 import prisma from "@/lib/db";
-import { User } from "@prisma/client";
+import bcrypt from "bcrypt";
+import { User, UserWithId } from "@/types/user";
 
 interface GetAllUserOptions {
   page?: number;
@@ -15,7 +16,7 @@ interface GetAllUserOptions {
 }
 
 interface GetAllUserResult {
-  users: User[];
+  users: UserWithId[];
   totalCount: number;
 }
 
@@ -59,8 +60,6 @@ export async function getAllUser(
   }
 }
 
-type ExtendedUser = Omit<User, "id">;
-
 export async function getUserById(userId: string) {
   try {
     const user = await prisma.user.findFirst({
@@ -81,7 +80,7 @@ export async function getUserById(userId: string) {
   }
 }
 
-export async function AddNewUser({ user }: { user: ExtendedUser }) {
+export async function AddNewUser({ user }: { user: User }) {
   try {
     const { fullname, username, email, password, avatar, address, role } = user;
 
@@ -93,12 +92,14 @@ export async function AddNewUser({ user }: { user: ExtendedUser }) {
 
     if (isUserEmailExits) return { error: "User already exits" };
 
+    const hashedPassword = await hashPassword(password);
+
     await prisma.user.create({
       data: {
         fullname,
         username,
         email,
-        password,
+        password: hashedPassword,
         address,
         avatar,
         role,
@@ -117,7 +118,7 @@ export async function EditUser({
   user,
   userId,
 }: {
-  user: ExtendedUser;
+  user: User;
   userId: string;
 }) {
   try {
@@ -131,6 +132,8 @@ export async function EditUser({
 
     if (!isUser) return { error: "User not found" };
 
+    const hashedPassword = await hashPassword(password);
+
     await prisma.user.update({
       where: {
         id: isUser.id,
@@ -139,7 +142,7 @@ export async function EditUser({
         fullname: fullname ?? isUser.fullname,
         username: username ?? isUser.username,
         email: email ?? isUser.email,
-        password: password ?? isUser.password,
+        password: hashedPassword ?? isUser.password,
         address: address ?? isUser.address,
         avatar: avatar ?? isUser.avatar,
         role: role ?? isUser.role,
@@ -166,5 +169,16 @@ export async function DeleteUser(userId: string) {
     console.error("Error creating user:", error);
     // Handle error
     return { error: "Internal Server Error" };
+  }
+}
+
+const saltRounds = 10; // Number of salt rounds for bcrypt hashing
+
+async function hashPassword(password: string): Promise<string> {
+  try {
+    const hashedPassword = await bcrypt.hash(password, saltRounds);
+    return hashedPassword;
+  } catch (error) {
+    throw new Error("Error hashing password");
   }
 }
