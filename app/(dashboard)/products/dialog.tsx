@@ -21,7 +21,6 @@ import {
 } from "@/components/ui/select";
 import { useServerAction } from "@/hooks/useServerAction";
 import { useServerFetch } from "@/hooks/useServerFetch";
-import { createRandomProduct } from "@/lib/faker";
 import {
   AddNewProduct,
   EditProduct,
@@ -302,8 +301,6 @@ export function AddProductDialog() {
 
   const handleSubmit = async () => {
     try {
-      const product = createRandomProduct();
-
       await runAction({
         product,
       }).then((result) => {

@@ -202,8 +202,8 @@ export function EditUserDialog({ userId }: { userId: string }) {
                     <SelectValue placeholder="Select a role" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="AVAILABLE">Available</SelectItem>
-                    <SelectItem value="NOT_AVAILABLE">Not Available</SelectItem>
+                    <SelectItem value="ADMIN">Admin</SelectItem>
+                    <SelectItem value="CUSTOMER">Customer</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -404,8 +404,8 @@ export function AddUserDialog() {
                     <SelectValue placeholder="Select a role" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="AVAILABLE">Available</SelectItem>
-                    <SelectItem value="NOT_AVAILABLE">Not Available</SelectItem>
+                    <SelectItem value="ADMIN">Admin</SelectItem>
+                    <SelectItem value="CUSTOMER">Customer</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
