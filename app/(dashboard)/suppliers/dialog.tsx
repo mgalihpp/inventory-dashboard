@@ -20,7 +20,7 @@ import {
   getSupplierById,
 } from "@/server/supplierAction";
 import { Supplier } from "@/types/supplier";
-import { Loader2 } from "lucide-react";
+import { Loader2, UploadIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { ChangeEvent, useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -109,7 +109,7 @@ export function EditSupplierDialog({ supplierId }: { supplierId: string }) {
           focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none 
           data-[disabled]:opacity-50 w-full"
         >
-          Edit product
+          Edit supplier
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
@@ -245,7 +245,8 @@ export function AddSupplierDialog() {
           focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center 
           dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800"
         >
-          Edit product
+          <UploadIcon className="w-4 h-4" />
+          Add supplier
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
