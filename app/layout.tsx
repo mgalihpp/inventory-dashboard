@@ -22,7 +22,7 @@ export default function RootLayout({
       <body className={inter.className}>
         <NextTopLoader showSpinner={false} />
         <ThemeProvider attribute="class">{children}</ThemeProvider>
-        <Toaster position="bottom-right" richColors/>
+        <Toaster position="top-center" richColors />
       </body>
     </html>
   );
