@@ -75,15 +75,15 @@ export default function SupplierTable({ data }: { data: SupplierWithId[] }) {
                 <DropdownMenuItem
                   onClick={() => {
                     navigator.clipboard.writeText(supplier.id);
-                    toast(`Copied product ID: ${supplier.id}`);
+                    toast(`Copied supplier ID: ${supplier.id}`);
                   }}
                 >
-                  Copy product ID
+                  Copy supplier ID
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <EditSupplierDialog supplierId={supplier.id} />
-                <DropdownMenuItem>View product details</DropdownMenuItem>
-                <DropdownMenuItem>Delete product</DropdownMenuItem>
+                <DropdownMenuItem>View supplier details</DropdownMenuItem>
+                <DropdownMenuItem>Delete supplier</DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           );

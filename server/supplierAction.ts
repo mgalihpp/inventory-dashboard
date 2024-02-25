@@ -33,8 +33,8 @@ export async function getAllSupplier(
     } = options;
 
     const suppliers = await prisma.supplier.findMany({
-      take: pageSize,
-      skip: (page - 1) * pageSize,
+      // take: pageSize,
+      // skip: (page - 1) * pageSize,
       // orderBy: {
       //   [sortBy]: sortOrder.toUpperCase(), // Sort order can be 'asc' or 'desc'
       // },

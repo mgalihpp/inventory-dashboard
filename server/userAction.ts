@@ -34,8 +34,8 @@ export async function getAllUser(
     } = options;
 
     const users = await prisma.user.findMany({
-      take: pageSize,
-      skip: (page - 1) * pageSize,
+      // take: pageSize,
+      // skip: (page - 1) * pageSize,
       // orderBy: {
       //   [sortBy]: sortOrder.toUpperCase(), // Sort order can be 'asc' or 'desc'
       // },

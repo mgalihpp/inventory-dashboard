@@ -8,14 +8,8 @@ export const metadata: Metadata = {
   title: "Suppliers",
   description: "supplier",
 };
-export default async function SupplierDashboard({
-  searchParams,
-}: {
-  searchParams?: { pageSize: string };
-}) {
-  const pageSize = parseInt((searchParams?.pageSize as string) ?? 10);
-
-  const data = await getAllSupplier({ pageSize });
+export default async function SupplierDashboard() {
+  const data = await getAllSupplier();
 
   return (
     <>

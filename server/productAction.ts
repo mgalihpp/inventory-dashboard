@@ -26,15 +26,15 @@ export async function getAllProduct(
   try {
     const {
       page = 1,
-      pageSize = 10,
+      pageSize = 11,
       sortBy = "createdAt",
       sortOrder = "asc",
       filterBy = {},
     } = options;
 
     const products = await prisma.product.findMany({
-      take: pageSize,
-      skip: (page - 1) * pageSize,
+      // take: pageSize,
+      // skip: (page - 1) * pageSize,
       // orderBy: {
       //   [sortBy]: sortOrder.toUpperCase(), // Sort order can be 'asc' or 'desc'
       // },

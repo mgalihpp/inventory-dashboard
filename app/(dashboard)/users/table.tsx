@@ -93,15 +93,15 @@ export default function UserTable({ data }: { data: UserWithId[] }) {
                 <DropdownMenuItem
                   onClick={() => {
                     navigator.clipboard.writeText(user.id);
-                    toast(`Copied product ID: ${user.id}`);
+                    toast(`Copied user ID: ${user.id}`);
                   }}
                 >
-                  Copy product ID
+                  Copy user ID
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <EditUserDialog userId={user.id} />
-                <DropdownMenuItem>View product details</DropdownMenuItem>
-                <DropdownMenuItem>Delete product</DropdownMenuItem>
+                <DropdownMenuItem>View user details</DropdownMenuItem>
+                <DropdownMenuItem>Delete user</DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           );

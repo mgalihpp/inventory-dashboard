@@ -14,29 +14,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { updateSearchParams } from "@/lib/utils";
-import { useRouter } from "next/navigation";
 
 interface DataTablePaginationProps<TData> {
   table: Table<TData>;
 }
 
-interface searchParamsProps {
-  title: string;
-  value: string;
-}
-
 export function DataTablePagination<TData>({
   table,
 }: DataTablePaginationProps<TData>) {
-  const router = useRouter();
-
-  const handleUpdateParams = ({ title, value }: searchParamsProps) => {
-    const newPathName = updateSearchParams(title, value.toLowerCase());
-
-    router.push(newPathName);
-  };
-
   return (
     <div className="flex flex-wrap items-center justify-between p-2">
       <div className="flex-1 text-sm text-muted-foreground">
@@ -49,10 +34,6 @@ export function DataTablePagination<TData>({
           <Select
             value={`${table.getState().pagination.pageSize}`}
             onValueChange={(value) => {
-              handleUpdateParams({
-                title: "pageSize",
-                value: value,
-              });
               table.setPageSize(Number(value));
             }}
           >
