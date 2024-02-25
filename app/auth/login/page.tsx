@@ -1,8 +1,10 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import { useServerAction } from "@/hooks/useServerAction";
 import { LoginAction } from "@/server/authActions";
 import { hasCookie } from "cookies-next";
+import { Loader2 } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -47,9 +49,9 @@ export default function Login() {
 
   return (
     <div className="w-full">
-      <div className="w-full h-dvh m-0 flex flex-wrap items-center justify-center bg-primary">
+      <div className="w-full h-dvh flex flex-wrap items-center justify-center bg-primary">
         <div
-          className="w-full overflow-hidden bg-background flex flex-wrap items-stretch 
+          className="w-full overflow-hidden bg-background flex flex-wrap items-stretch
         flex-row-reverse"
         >
           <form
@@ -58,7 +60,7 @@ export default function Login() {
           flex-col md:p-20 space-y-4
           "
           >
-            <span className="text-3xl font-semibold pb-10">
+            <span className="text-xl sm:text-3xl font-semibold pb-10 break-words">
               Login to Inventory Application
             </span>
             <div className="flex flex-col w-full text-lg">
@@ -91,15 +93,19 @@ export default function Login() {
             {error && <div className="text-red-500">{error}</div>}
 
             <div className="mt-8 w-full">
-              <button
+              <Button
                 disabled={isRunning}
                 className="bg-purple-400 w-full p-2.5 rounded-md text-white font-semibold 
-                hover:bg-purple-500
+                hover:bg-purple-500 text-base
                 "
                 name="login"
               >
-                Login
-              </button>
+                {isRunning ? (
+                  <Loader2 className="w-4 h-4 animate-spin mx-auto" />
+                ) : (
+                  "Login"
+                )}
+              </Button>
             </div>
           </form>
 
