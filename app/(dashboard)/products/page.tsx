@@ -8,8 +8,14 @@ export const metadata: Metadata = {
   title: "Products",
   description: "product",
 };
-export default async function ProductDashboard() {
-  const data = await getAllProduct();
+export default async function ProductDashboard({
+  searchParams,
+}: {
+  searchParams?: { pageSize: string };
+}) {
+  const pageSize = parseInt((searchParams?.pageSize as string) ?? 10);
+
+  const data = await getAllProduct({ pageSize });
 
   return (
     <>

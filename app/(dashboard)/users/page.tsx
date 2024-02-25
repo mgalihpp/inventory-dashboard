@@ -8,8 +8,14 @@ export const metadata: Metadata = {
   title: "Users",
   description: "user account",
 };
-export default async function UserDashboard() {
-  const data = await getAllUser();
+export default async function UserDashboard({
+  searchParams,
+}: {
+  searchParams?: { pageSize: string };
+}) {
+  const pageSize = parseInt((searchParams?.pageSize as string) ?? 10);
+
+  const data = await getAllUser({ pageSize });
 
   return (
     <>

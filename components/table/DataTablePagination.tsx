@@ -14,26 +14,45 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { updateSearchParams } from "@/lib/utils";
+import { useRouter } from "next/navigation";
 
 interface DataTablePaginationProps<TData> {
   table: Table<TData>;
 }
 
+interface searchParamsProps {
+  title: string;
+  value: string;
+}
+
 export function DataTablePagination<TData>({
   table,
 }: DataTablePaginationProps<TData>) {
+  const router = useRouter();
+
+  const handleUpdateParams = ({ title, value }: searchParamsProps) => {
+    const newPathName = updateSearchParams(title, value.toLowerCase());
+
+    router.push(newPathName);
+  };
+
   return (
-    <div className="flex items-center justify-between p-2">
+    <div className="flex flex-wrap items-center justify-between p-2">
       <div className="flex-1 text-sm text-muted-foreground">
         {table.getFilteredSelectedRowModel().rows.length} of{" "}
         {table.getFilteredRowModel().rows.length} row(s) selected.
       </div>
-      <div className="flex items-center space-x-6 lg:space-x-8">
+      <div className="flex flex-wrap items-center space-x-6 lg:space-x-8 gap-2 lg:gap-0">
         <div className="flex items-center space-x-2">
           <p className="text-sm font-medium">Rows per page</p>
           <Select
             value={`${table.getState().pagination.pageSize}`}
             onValueChange={(value) => {
+              handleUpdateParams({
+                title: "pageSize",
+                value: value,
+              });
               table.setPageSize(Number(value));
             }}
           >
