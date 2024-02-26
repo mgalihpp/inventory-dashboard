@@ -66,7 +66,11 @@ export function EditUserDialog({ userId }: { userId: string }) {
       if ("error" in result) {
         setError(result.error);
       } else {
-        setUser(result);
+        setUser({
+          ...result,
+          // This means that the password cannot be changed unless the user makes input
+          password: "",
+        });
       }
     }
   );
