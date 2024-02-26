@@ -37,6 +37,56 @@ enum Category {
   medicine
   herbs
   household_equipment
+  freshproduce
+  beverages
+  snacksandsweets
+  dairyandeggs
+  bakeryandbread
+  cannedgoods
+  frozenfoods
+  meatandpoultry
+  seafood
+  condimentsandsauces
+  spicesandseasonings
+  pastaandgrains
+  breakfastfoods
+  babyfoodandformula
+  petfoodandsupplies
+  healthandwellness
+  cleaningsupplies
+  paperproducts
+  officesupplies
+  electronicsandgadgets
+  homedecor
+  kitchenappliances
+  toolsandhardware
+  toysandgames
+  booksandmagazines
+  clothingandaccessories
+  shoesandfootwear
+  jewelryandwatches
+  beautyandpersonalcare
+  homeimprovement
+  outdoorandgarden
+  sportsandfitness
+  automotiveandcaraccessories
+  electricalappliances
+  furnitureandfurnishings
+  craftsupplies
+  partysupplies
+  travelandluggage
+  artandcraft
+  musicalinstruments
+  stationeryandschoolsupplies
+  giftsandsouvenirs
+  electricalandlighting
+  homeentertainment
+  petsupplies
+  hobbiesandcollectibles
+  antiquesandvintage
+  hometextiles
+  cookwareandkitchenware
+  homesecurityandsafety
 }
 
 enum Status {

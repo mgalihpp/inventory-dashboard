@@ -1,3 +1,4 @@
+import { $Enums } from "@prisma/client";
 import { faker } from "@faker-js/faker";
 import { User } from "@/types/user";
 import { Product } from "@/types/product";
@@ -11,23 +12,17 @@ export function createRandomUser(): User {
     fullname: faker.person.fullName(),
     username: faker.person.firstName(),
     address: faker.location.streetAddress(),
-    role: faker.helpers.arrayElement(["ADMIN", "CUSTOMER"]),
+    role: faker.helpers.arrayElement(Object.values($Enums.Role)),
   };
 }
 
 export function createRandomProduct(): Product {
   return {
     name: faker.commerce.productName(),
-    category: faker.helpers.arrayElement([
-      "drink",
-      "food",
-      "herbs",
-      "household_equipment",
-      "medicine",
-    ]),
+    category: faker.helpers.arrayElement(Object.values($Enums.Category)),
     qty: faker.number.int({ min: 0, max: 100 }),
     price: faker.number.float({ min: 0, max: 100 }),
-    status: faker.helpers.arrayElement(["AVAILABLE", "NOT_AVAILABLE"]),
+    status: faker.helpers.arrayElement(Object.values($Enums.Status)),
   };
 }
 

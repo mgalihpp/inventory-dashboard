@@ -179,13 +179,11 @@ export function EditProductDialog({ productId }: { productId: string }) {
                     <SelectValue placeholder="Select a category" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="food">Food</SelectItem>
-                    <SelectItem value="drink">Drink</SelectItem>
-                    <SelectItem value="medicine">Medicine</SelectItem>
-                    <SelectItem value="herbs">Herbs</SelectItem>
-                    <SelectItem value="household_equipment">
-                      Household Equipment
-                    </SelectItem>
+                    {Object.keys($Enums.Category).map((key) => (
+                      <SelectItem key={key} value={key} className="capitalize">
+                        {key}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>
@@ -383,13 +381,11 @@ export function AddProductDialog() {
                     <SelectValue placeholder="Select a category" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="food">Food</SelectItem>
-                    <SelectItem value="drink">Drink</SelectItem>
-                    <SelectItem value="medicine">Medicine</SelectItem>
-                    <SelectItem value="herbs">Herbs</SelectItem>
-                    <SelectItem value="household_equipment">
-                      Household Equipment
-                    </SelectItem>
+                    {Object.keys($Enums.Category).map((key) => (
+                      <SelectItem key={key} value={key} className="capitalize">
+                        {key}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>
