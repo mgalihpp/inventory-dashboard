@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { useServerAction } from "@/hooks/useServerAction";
-import { LoginAction } from "@/server/authActions";
+import { RegisterAction } from "@/server/authActions";
 import { hasCookie } from "cookies-next";
 import { Loader2 } from "lucide-react";
 import Image from "next/image";
@@ -10,12 +10,12 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
-export default function Login() {
+export default function Register() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
 
-  const [runAction, isRunning] = useServerAction(LoginAction);
+  const [runAction, isRunning] = useServerAction(RegisterAction);
 
   const token = hasCookie("token");
   const router = useRouter();
@@ -37,13 +37,13 @@ export default function Login() {
     try {
       await runAction(e).then((result) => {
         if (result?.success) {
-          router.replace("/dashboard");
+          window.location.href = "/auth/login";
         } else {
           setError(result?.error as string);
         }
       });
     } catch (error) {
-      console.error("Error logging in:", error);
+      console.error("Error register:", error);
       setError("An unexpected error occurred");
     }
   };
@@ -62,7 +62,7 @@ export default function Login() {
           "
           >
             <span className="text-xl sm:text-3xl font-semibold pb-10 break-words">
-              Login to Inventory Application
+              Register to Inventory Application
             </span>
             <div className="flex flex-col w-full text-lg">
               Email
@@ -94,9 +94,9 @@ export default function Login() {
             {error && <div className="text-red-500">{error}</div>}
 
             <div className="mt-2 self-end text-xs">
-              Doesn&apos;t have account ?{" "}
-              <Link href="/auth/register" className="underline">
-                register
+              Already have account ?{" "}
+              <Link href="/auth/login" className="underline">
+                login
               </Link>
             </div>
 
@@ -106,17 +106,17 @@ export default function Login() {
                 className="bg-purple-400 w-full p-2.5 rounded-md text-white font-semibold 
                 hover:bg-purple-500 text-base
                 "
-                name="login"
+                name="register"
               >
                 {isRunning ? (
                   <div className="flex items-center justify-center gap-2 mx-auto">
                     <p className="text-xs font-semibold">
-                      Redirecting to Dashboard
+                      Redirecting to Login
                     </p>
                     <Loader2 className="w-4 h-4 animate-spin mx-auto" />
                   </div>
                 ) : (
-                  "Login"
+                  "Register"
                 )}
               </Button>
             </div>
