@@ -16,6 +16,8 @@ import { ColumnDef } from "@tanstack/react-table";
 import { MoreHorizontal } from "lucide-react";
 import { toast } from "sonner";
 import { EditSupplierDialog } from "./dialog";
+import DeleteButton from "@/components/button/deletebtn";
+import { DeleteSupplier } from "@/server/supplierAction";
 
 interface props {
   columns: ColumnDef<any, any>[];
@@ -83,7 +85,7 @@ export default function SupplierTable({ data }: { data: SupplierWithId[] }) {
                 <DropdownMenuSeparator />
                 <EditSupplierDialog supplierId={supplier.id} />
                 <DropdownMenuItem>View supplier details</DropdownMenuItem>
-                <DropdownMenuItem>Delete supplier</DropdownMenuItem>
+                <DeleteButton id={supplier.id} deleteAction={DeleteSupplier} />
               </DropdownMenuContent>
             </DropdownMenu>
           );

@@ -16,6 +16,8 @@ import { ColumnDef } from "@tanstack/react-table";
 import { MoreHorizontal } from "lucide-react";
 import { toast } from "sonner";
 import { EditUserDialog } from "./dialog";
+import DeleteButton from "@/components/button/deletebtn";
+import { DeleteUser } from "@/server/userAction";
 
 interface props {
   columns: ColumnDef<any, any>[];
@@ -101,7 +103,7 @@ export default function UserTable({ data }: { data: UserWithId[] }) {
                 <DropdownMenuSeparator />
                 <EditUserDialog userId={user.id} />
                 <DropdownMenuItem>View user details</DropdownMenuItem>
-                <DropdownMenuItem>Delete user</DropdownMenuItem>
+                <DeleteButton id={user.id} deleteAction={DeleteUser} />
               </DropdownMenuContent>
             </DropdownMenu>
           );
