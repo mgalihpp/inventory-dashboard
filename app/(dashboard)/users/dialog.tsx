@@ -168,7 +168,6 @@ export function EditUserDialog({ userId }: { userId: string }) {
                   name="password"
                   type="password"
                   className="col-span-3"
-                  value={""}
                   onChange={handleChange}
                 />
               </div>
